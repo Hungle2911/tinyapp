@@ -9,13 +9,13 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 function generateRandomString() {
-  let result = []
-  let alphanumeric = `123456789qwertyuiopasdfghjklzxcvbnm`
+  let result = [];
+  let alphanumeric = `123456789qwertyuiopasdfghjklzxcvbnm`;
   for (let i = 0; i < 6; i++) {
-    let random = Math.round(Math.random() * alphanumeric.length)
-    result.push(alphanumeric[random])
+    let random = Math.round(Math.random() * alphanumeric.length);
+    result.push(alphanumeric[random]);
   }
-  return result.join('')
+  return result.join('');
 }
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -34,9 +34,9 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 app.post("/urls", (req, res) => {
-  let id = generateRandomString()
-  urlDatabase[id] = req.body.longURL
-  res.redirect(`/urls/${id}`); 
+  let id = generateRandomString();
+  urlDatabase[id] = req.body.longURL;
+  res.redirect(`/urls/${id}`);
 });
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
@@ -44,8 +44,12 @@ app.get("/urls/:id", (req, res) => {
 });
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id]
-  res.redirect(longURL);
+  const longURL = urlDatabase[id];
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    res.status(404).send("URL not found");
+  }
 });
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
