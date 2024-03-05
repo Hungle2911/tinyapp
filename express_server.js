@@ -42,12 +42,20 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
+//Edit URL
 app.post("/urls/:id", (req, res) => {
   let id = req.params.id
   const updatedURL = req.body.updatedURL;
   urlDatabase[id] = updatedURL
   res.redirect(`/urls`)
 });
+//Login
+app.post("/login", (req, res) => {
+  const submittedUsername = req.body.username
+  res.cookie('username', submittedUsername)
+  res.redirect('/urls')
+});
+//Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const idToDelete = req.params.id;
   delete urlDatabase[idToDelete];
