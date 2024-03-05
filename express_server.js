@@ -12,7 +12,7 @@ function generateRandomString() {
   let result = [];
   let alphanumeric = `123456789qwertyuiopasdfghjklzxcvbnm`;
   for (let i = 0; i < 6; i++) {
-    let random = Math.round(Math.random() * alphanumeric.length);
+    let random = Math.floor(Math.random() * alphanumeric.length);
     result.push(alphanumeric[random]);
   }
   return result.join('');
@@ -42,10 +42,15 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
+app.post("/urls/:id", (req, res) => {
+  let id = req.params.id
+  const updatedURL = req.body.updatedURL;
+  urlDatabase[id] = updatedURL
+  res.redirect(`/urls`)
+});
 app.post("/urls/:id/delete", (req, res) => {
   const idToDelete = req.params.id;
   delete urlDatabase[idToDelete];
-  console.log(urlDatabase);
   res.redirect("/urls")
 });
 app.get("/u/:id", (req, res) => {
