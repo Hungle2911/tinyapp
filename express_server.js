@@ -10,6 +10,18 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
 function generateRandomString() {
   let result = [];
   let alphanumeric = `123456789qwertyuiopasdfghjklzxcvbnm`;
@@ -31,13 +43,13 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase ,
-    username: req.cookies["username"],
+    username: users[req.cookies["user_id"]],
   };
   res.render("urls_index", templateVars);
 });
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    username: users[req.cookies["user_id"]]
   }
   res.render("urls_new", templateVars);
 });
@@ -50,7 +62,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { 
     id: req.params.id, 
     longURL: urlDatabase[req.params.id], 
-    username: req.cookies["username"] };
+    username: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 //Edit URL
@@ -68,12 +80,23 @@ app.post("/login", (req, res) => {
 });
 //Logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 //Register 
 app.get('/register', (req, res) => {
   res.render('register')
+})
+app.post('/register', (req, res) => {
+  let id = generateRandomString();
+  const { email, password } = req.body;
+   users[id] = {
+    id,
+    email,
+    password
+   }
+  res.cookie('user_id', id);
+  res.redirect('/urls');
 })
 //Delete URL
 app.post("/urls/:id/delete", (req, res) => {
