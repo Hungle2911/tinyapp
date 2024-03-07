@@ -66,7 +66,14 @@ app.post("/login", (req, res) => {
   res.cookie('username', submittedUsername)
   res.redirect('/urls')
 });
+//Logout
+app.post("/logout", (req, res) => {
+  // Clear the username cookie
+  res.clearCookie('username');
 
+  // Redirect the user back to the /urls page
+  res.redirect("/urls");
+});
 //Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const idToDelete = req.params.id;
