@@ -68,12 +68,13 @@ app.post("/login", (req, res) => {
 });
 //Logout
 app.post("/logout", (req, res) => {
-  // Clear the username cookie
   res.clearCookie('username');
-
-  // Redirect the user back to the /urls page
   res.redirect("/urls");
 });
+//Register 
+app.get('/register', (req, res) => {
+  res.render('register')
+})
 //Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const idToDelete = req.params.id;
