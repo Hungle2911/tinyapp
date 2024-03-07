@@ -50,12 +50,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { 
     id: req.params.id, 
     longURL: urlDatabase[req.params.id], 
-<<<<<<< HEAD
-    username: req.cookies["username"] 
-  };
-=======
     username: req.cookies["username"] };
->>>>>>> feature/cookies
   res.render("urls_show", templateVars);
 });
 //Edit URL
@@ -71,9 +66,6 @@ app.post("/login", (req, res) => {
   res.cookie('username', submittedUsername)
   res.redirect('/urls')
 });
-<<<<<<< HEAD
-
-=======
 //Logout
 app.post("/logout", (req, res) => {
   // Clear the username cookie
@@ -82,7 +74,6 @@ app.post("/logout", (req, res) => {
   // Redirect the user back to the /urls page
   res.redirect("/urls");
 });
->>>>>>> feature/cookies
 //Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const idToDelete = req.params.id;
