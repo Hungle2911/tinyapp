@@ -31,6 +31,13 @@ function generateRandomString() {
   }
   return result.join('');
 }
+function getUserByEmail(database, email) {
+  for (let user in database) {
+    if (database[user].email === email) {
+    return database[user];
+    }
+  } return undefined
+}
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -88,8 +95,12 @@ app.get('/register', (req, res) => {
   res.render('register')
 })
 app.post('/register', (req, res) => {
-  let id = generateRandomString();
   const { email, password } = req.body;
+  if (!email || !password ){
+    res.status(400).send('Please make sure you fill out both username and password fields.')
+  } else {
+    if (!getUserByEmail(users, req.body.email)) {
+      let id = generateRandomString();
    users[id] = {
     id,
     email,
@@ -97,6 +108,9 @@ app.post('/register', (req, res) => {
    }
   res.cookie('user_id', id);
   res.redirect('/urls');
+  }else {
+    res.status(400).send('This email was taken.')
+  }}
 })
 //Delete URL
 app.post("/urls/:id/delete", (req, res) => {
