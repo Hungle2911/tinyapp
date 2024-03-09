@@ -36,7 +36,7 @@ function getUserByEmail(database, email) {
     if (database[user].email === email) {
     return database[user];
     }
-  } return undefined
+  } return null
 }
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -97,7 +97,7 @@ app.get('/login', (req, res) =>{
 //Logout
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 //Register 
 app.get('/register', (req, res) => {
