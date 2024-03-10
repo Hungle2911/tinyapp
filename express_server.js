@@ -5,7 +5,12 @@ app.use(cookieParser())
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
-
+cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  keys: ['great_cookie'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -38,9 +43,13 @@ function getUserByEmail(database, email) {
     }
   } return null
 }
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+// app.get('/', (req, res) => {
+//   if (req.cookies.userID) {
+//     res.redirect('/urls');
+//   } else {
+//     res.redirect('/login');
+//   }
+// });
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -55,12 +64,18 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 app.get("/urls/new", (req, res) => {
+  if (req.cookies.user_id) {
   const templateVars = {
     user_id: users[req.cookies["user_id"]]
   }
-  res.render("urls_new", templateVars);
+  res.render("urls_new", templateVars);}
+  else { res.redirect('/login');
+  } 
 });
 app.post("/urls", (req, res) => {
+  if (!req.cookies.user_id) {
+    res.status(401).send('You have to login first')
+  }
   let id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   res.redirect(`/urls/${id}`);
@@ -70,11 +85,13 @@ app.get("/urls/:id", (req, res) => {
     id: req.params.id, 
     longURL: urlDatabase[req.params.id], 
     user_id: users[req.cookies["user_id"]] };
-  res.render("urls_show", templateVars);
+    if (!urlDatabase[templateVars.id]) {
+      res.send('This short URL does not exist.')
+    } else {res.render("urls_show", templateVars);}
 });
 //Edit URL
 app.post("/urls/:id", (req, res) => {
-  let id = req.params.id
+  let id = req.params.id 
   const updatedURL = req.body.updatedURL;
   urlDatabase[id] = updatedURL
   res.redirect(`/urls`)
@@ -92,6 +109,10 @@ app.post("/login", (req, res) => {
   }
 });
 app.get('/login', (req, res) =>{
+  if (req.cookies.user_id) {
+    res.redirect('/urls');
+    return;
+  } 
   res.render('login')
 })
 //Logout
@@ -101,6 +122,10 @@ app.post("/logout", (req, res) => {
 });
 //Register 
 app.get('/register', (req, res) => {
+  if (req.cookies.user_id) {
+    res.redirect('/urls');
+    return;
+  } 
   res.render('register')
 })
 app.post('/register', (req, res) => {
