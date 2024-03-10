@@ -5,6 +5,7 @@ app.use(cookieParser())
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session')
 app.use(cookieSession({
