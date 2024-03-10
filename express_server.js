@@ -6,12 +6,13 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 const bcrypt = require("bcryptjs");
-cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session')
 app.use(cookieSession({
   name: 'session',
   keys: ['great_cookie'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -34,31 +35,7 @@ const users = {
     password: "dishwasher-funk",
   },
 };
-function generateRandomString() {
-  let result = [];
-  let alphanumeric = `123456789qwertyuiopasdfghjklzxcvbnm`;
-  for (let i = 0; i < 6; i++) {
-    let random = Math.floor(Math.random() * alphanumeric.length);
-    result.push(alphanumeric[random]);
-  }
-  return result.join('');
-}
-function getUserByEmail(database, email) {
-  for (let user in database) {
-    if (database[user].email === email) {
-    return database[user];
-    }
-  } return null
-}
-const urlsForUser = (id) => {
-  const userUrls = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      userUrls[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return userUrls;
-};
+
 app.get('/', (req, res) => {
   if (req.session.userID) {
     res.redirect('/urls');
@@ -73,7 +50,7 @@ app.get("/urls", (req, res) => {
     res.render("urls_error");
     return;
   }
-  const userUrls = urlsForUser(user_id);
+  const userUrls = urlsForUser(user_id, urlDatabase);
   const templateVars = {
     urls: userUrls,
     user_id: users[user_id],
@@ -109,7 +86,7 @@ app.get("/urls/:id", (req, res) => {
     id: req.params.id, 
     longURL: urlDatabase[req.params.id], 
     user_id: users[userID] };
-  const userUrls = urlsForUser(userID);
+  const userUrls = urlsForUser(userID, urlDatabase);
     if (!urlDatabase[templateVars.id]) {
       res.status(404).send('This short URL does not exist.')
     } else if (!userID || !userUrls[req.params.id]) {
